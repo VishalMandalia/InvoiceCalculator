@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -23,7 +24,7 @@
     </script>
     <style>
         body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        /* Mobile App container feel */
+        /* Mobile App container feel on desktop, full width on mobile */
         @media (min-width: 768px) {
             .mobile-app-container {
                 max-width: 480px;
@@ -39,7 +40,7 @@
 <body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col justify-between">
 
     <!-- Mobile Wrapper / App Shell -->
-    <div class="mobile-app-container w-full bg-slate-50 flex flex-col min-h-screen md:min-h-[850px] relative">
+    <div class="mobile-app-container w-full bg-slate-50 flex flex-col min-h-screen md:min-h-[880px] relative">
 
         <!-- Top App Header -->
         <header class="bg-indigo-600 text-white pt-8 pb-6 px-5 rounded-b-3xl shadow-lg relative overflow-hidden">
@@ -51,56 +52,72 @@
                     </div>
                     <div>
                         <h1 class="font-bold text-lg leading-tight">TaxSplit Mobile</h1>
-                        <p class="text-xs text-indigo-200">Invoice & GST Breakdown</p>
+                        <p class="text-xs text-indigo-200">Hall & Food GST Calculator</p>
                     </div>
                 </div>
-                <button onclick="resetDefaults()" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-xs text-white transition">
+                <button onclick="resetDefaults()" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-xs text-white transition active:scale-95" title="Reset">
                     <i class="fa-solid fa-rotate-right"></i>
                 </button>
             </div>
         </header>
 
         <!-- Main Scrollable Content -->
-        <main class="flex-grow p-4 sm:p-5 space-y-4 overflow-y-auto pb-24">
+        <main class="flex-grow p-4 sm:p-5 space-y-4 overflow-y-auto pb-28">
             
             <!-- Inputs Card -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/70 space-y-3.5">
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                     <span class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center">
-                        <i class="fa-solid fa-sliders text-indigo-600 mr-1.5"></i> Parameters
+                        <i class="fa-solid fa-sliders text-indigo-600 mr-1.5"></i> Invoice Parameters
                     </span>
-                    <div class="flex space-x-1 bg-slate-100 p-0.5 rounded-lg text-[11px] font-semibold">
-                        <button type="button" id="modeInclusiveBtn" onclick="setMode('inclusive')" class="px-2.5 py-1 rounded-md bg-white text-indigo-600 shadow-sm transition">Fixed Total</button>
-                        <button type="button" id="modeExclusiveBtn" onclick="setMode('exclusive')" class="px-2.5 py-1 rounded-md text-slate-500 transition">Additive</button>
-                    </div>
+                    <span class="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">Fixed Total Mode</span>
                 </div>
 
                 <!-- Total Invoice Value -->
-                <div id="totalInvoiceGroup">
+                <div>
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Total Invoice Value (₹)</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 font-semibold">₹</div>
-                        <input type="number" id="totalInvoice" value="200000" oninput="calculate()" class="w-full pl-7 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <input type="number" id="totalInvoice" value="200000" oninput="calculate()" class="w-full pl-7 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                     </div>
                 </div>
 
-                <!-- Hall Rent Base Amount -->
+                <!-- Hall Rent Variant Selector -->
                 <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Hall Rent Base (₹)</label>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Hall Rent Variant (Base)</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" id="variant30k" onclick="selectHallVariant(30000)" class="py-2.5 px-2 rounded-xl text-xs font-bold border transition flex flex-col items-center justify-center space-y-0.5 bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100">
+                            <span>₹ 30,000</span>
+                            <span class="text-[9px] font-normal opacity-70">Variant 1</span>
+                        </button>
+                        <button type="button" id="variant60k" onclick="selectHallVariant(60000)" class="py-2.5 px-2 rounded-xl text-xs font-bold border transition flex flex-col items-center justify-center space-y-0.5 bg-indigo-600 border-indigo-600 text-white shadow-sm">
+                            <span>₹ 60,000</span>
+                            <span class="text-[9px] font-normal opacity-90">Variant 2</span>
+                        </button>
+                        <button type="button" id="variantCustom" onclick="selectHallVariant('custom')" class="py-2.5 px-2 rounded-xl text-xs font-bold border transition flex flex-col items-center justify-center space-y-0.5 bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100">
+                            <span>Custom</span>
+                            <span class="text-[9px] font-normal opacity-70">Manual</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Custom Hall Base Amount (Hidden by default unless custom selected) -->
+                <div id="customHallGroup" class="hidden">
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Custom Hall Base (₹)</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 font-semibold">₹</div>
-                        <input type="number" id="hallBase" value="60000" oninput="calculate()" class="w-full pl-7 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <input type="number" id="hallBaseCustom" value="60000" oninput="calculate()" class="w-full pl-7 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                     </div>
                 </div>
 
                 <!-- GST Rates Row -->
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 gap-3 pt-1">
                     <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Hall GST (%)</label>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Hall GST Rate (%)</label>
                         <input type="number" id="hallGstRate" value="18" step="0.5" oninput="calculate()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Food GST (%)</label>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Food GST Rate (%)</label>
                         <input type="number" id="foodGstRate" value="5" step="0.5" oninput="calculate()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                     </div>
                 </div>
@@ -126,7 +143,7 @@
                             <i class="fa-solid fa-building"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-slate-900 text-sm">Hall Rent</h3>
+                            <h3 class="font-bold text-slate-900 text-sm">Hall Rent Breakdown</h3>
                             <p class="text-[10px] text-slate-400 font-medium" id="hallGstBadgeSub">18% GST (9% CGST + 9% SGST)</p>
                         </div>
                     </div>
@@ -137,11 +154,11 @@
                         <span class="font-bold text-slate-900" id="resHallBase">₹ 60,000.00</span>
                     </div>
                     <div class="flex justify-between text-slate-500 text-[11px]">
-                        <span id="hallCgstLabelText">CGST (9%)</span>
+                        <span id="hallCgstLabelText">CGST (9.0%)</span>
                         <span id="resHallCgst">₹ 5,400.00</span>
                     </div>
                     <div class="flex justify-between text-slate-500 text-[11px]">
-                        <span id="hallSgstLabelText">SGST (9%)</span>
+                        <span id="hallSgstLabelText">SGST (9.0%)</span>
                         <span id="resHallSgst">₹ 5,400.00</span>
                     </div>
                     <div class="pt-2 border-t border-slate-200 flex justify-between items-center font-bold">
@@ -159,14 +176,14 @@
                             <i class="fa-solid fa-utensils"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-slate-900 text-sm">Food & Catering</h3>
+                            <h3 class="font-bold text-slate-900 text-sm">Food & Catering Breakdown</h3>
                             <p class="text-[10px] text-slate-400 font-medium" id="foodGstBadgeSub">5% GST (2.5% CGST + 2.5% SGST)</p>
                         </div>
                     </div>
                 </div>
                 <div class="bg-slate-50 rounded-xl p-3 space-y-1.5 text-xs">
                     <div class="flex justify-between font-medium">
-                        <span class="text-slate-500" id="foodBaseTitle">Base Amount (Derived)</span>
+                        <span class="text-slate-500">Base Amount (Derived from Balance)</span>
                         <span class="font-bold text-slate-900" id="resFoodBase">₹ 1,33,333.33</span>
                     </div>
                     <div class="flex justify-between text-slate-500 text-[11px]">
@@ -188,11 +205,11 @@
 
         <!-- Bottom Sticky Action Bar -->
         <footer class="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-slate-200 p-3.5 flex space-x-2 z-20">
-            <button onclick="copySummary()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-3 rounded-xl text-xs shadow-md shadow-indigo-100 transition flex items-center justify-center space-x-1.5">
+            <button onclick="copySummary()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-3 rounded-xl text-xs shadow-md shadow-indigo-100 transition active:scale-95 flex items-center justify-center space-x-1.5">
                 <i class="fa-regular fa-copy"></i>
                 <span>Copy Summary</span>
             </button>
-            <button onclick="shareWhatsApp()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-3 rounded-xl text-xs shadow-md shadow-emerald-100 transition flex items-center justify-center space-x-1.5">
+            <button onclick="shareWhatsApp()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-3 rounded-xl text-xs shadow-md shadow-emerald-100 transition active:scale-95 flex items-center justify-center space-x-1.5">
                 <i class="fa-brands fa-whatsapp text-sm"></i>
                 <span>WhatsApp</span>
             </button>
@@ -208,25 +225,34 @@
 
     <!-- Script Logic -->
     <script>
-        let currentMode = 'inclusive';
+        let selectedVariantValue = 60000;
 
-        function setMode(mode) {
-            currentMode = mode;
-            const incBtn = document.getElementById('modeInclusiveBtn');
-            const excBtn = document.getElementById('modeExclusiveBtn');
-            const totalGroup = document.getElementById('totalInvoiceGroup');
-            const foodBaseTitle = document.getElementById('foodBaseTitle');
+        function selectHallVariant(val) {
+            const btn30k = document.getElementById('variant30k');
+            const btn60k = document.getElementById('variant60k');
+            const btnCustom = document.getElementById('variantCustom');
+            const customGroup = document.getElementById('customHallGroup');
 
-            if (mode === 'inclusive') {
-                incBtn.className = "px-2.5 py-1 rounded-md bg-white text-indigo-600 shadow-sm transition";
-                excBtn.className = "px-2.5 py-1 rounded-md text-slate-500 transition";
-                totalGroup.style.display = 'block';
-                foodBaseTitle.innerText = "Base Amount (Derived)";
+            // Reset styles
+            const activeClass = "py-2.5 px-2 rounded-xl text-xs font-bold border transition flex flex-col items-center justify-center space-y-0.5 bg-indigo-600 border-indigo-600 text-white shadow-sm";
+            const inactiveClass = "py-2.5 px-2 rounded-xl text-xs font-bold border transition flex flex-col items-center justify-center space-y-0.5 bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100";
+
+            btn30k.className = inactiveClass;
+            btn60k.className = inactiveClass;
+            btnCustom.className = inactiveClass;
+
+            if (val === 30000) {
+                selectedVariantValue = 30000;
+                btn30k.className = activeClass;
+                customGroup.classList.add('hidden');
+            } else if (val === 60000) {
+                selectedVariantValue = 60000;
+                btn60k.className = activeClass;
+                customGroup.classList.add('hidden');
             } else {
-                excBtn.className = "px-2.5 py-1 rounded-md bg-white text-indigo-600 shadow-sm transition";
-                incBtn.className = "px-2.5 py-1 rounded-md text-slate-500 transition";
-                totalGroup.style.display = 'none';
-                foodBaseTitle.innerText = "Base Amount (Input)";
+                selectedVariantValue = 'custom';
+                btnCustom.className = activeClass;
+                customGroup.classList.remove('hidden');
             }
             calculate();
         }
@@ -246,21 +272,31 @@
 
         function resetDefaults() {
             document.getElementById('totalInvoice').value = 200000;
-            document.getElementById('hallBase').value = 60000;
             document.getElementById('hallGstRate').value = 18;
             document.getElementById('foodGstRate').value = 5;
-            setMode('inclusive');
+            document.getElementById('hallBaseCustom').value = 60000;
+            selectHallVariant(60000);
             showToast("Reset to default values");
         }
 
         function calculate() {
-            const hallBaseInput = parseFloat(document.getElementById('hallBase').value) || 0;
+            let hallBase = 60000;
+            if (selectedVariantValue === 30000) {
+                hallBase = 30000;
+            } else if (selectedVariantValue === 60000) {
+                hallBase = 60000;
+            } else {
+                hallBase = parseFloat(document.getElementById('hallBaseCustom').value) || 0;
+            }
+
+            const grandTotal = parseFloat(document.getElementById('totalInvoice').value) || 0;
             const hallGstRate = parseFloat(document.getElementById('hallGstRate').value) || 0;
             const foodGstRate = parseFloat(document.getElementById('foodGstRate').value) || 0;
 
             const hallHalf = hallGstRate / 2;
             const foodHalf = foodGstRate / 2;
 
+            // Update Labels
             document.getElementById('hallCgstLabelText').innerText = `CGST (${hallHalf}%)`;
             document.getElementById('hallSgstLabelText').innerText = `SGST (${hallHalf}%)`;
             document.getElementById('foodCgstLabelText').innerText = `CGST (${foodHalf}%)`;
@@ -269,29 +305,19 @@
             document.getElementById('hallGstBadgeSub').innerText = `${hallGstRate}% GST (${hallHalf}% CGST + ${hallHalf}% SGST)`;
             document.getElementById('foodGstBadgeSub').innerText = `${foodGstRate}% GST (${foodHalf}% CGST + ${foodHalf}% SGST)`;
 
-            let hallBase = hallBaseInput;
-            let hallCgst = hallBase * (hallHalf / 100);
-            let hallSgst = hallBase * (hallHalf / 100);
-            let hallTotal = hallBase + hallCgst + hallSgst;
+            // Hall calculations
+            const hallCgst = hallBase * (hallHalf / 100);
+            const hallSgst = hallBase * (hallHalf / 100);
+            const hallTotal = hallBase + hallCgst + hallSgst;
 
-            let foodBase, foodCgst, foodSgst, foodTotal, grandTotal, grandTax;
+            // Food calculations (Balance pool)
+            const foodTotal = Math.max(0, grandTotal - hallTotal);
+            const foodBase = foodTotal / (1 + (foodGstRate / 100));
+            const foodTotalTax = foodTotal - foodBase;
+            const foodCgst = foodTotalTax / 2;
+            const foodSgst = foodTotalTax / 2;
 
-            if (currentMode === 'inclusive') {
-                grandTotal = parseFloat(document.getElementById('totalInvoice').value) || 0;
-                foodTotal = Math.max(0, grandTotal - hallTotal);
-                foodBase = foodTotal / (1 + (foodGstRate / 100));
-                const foodTotalTax = foodTotal - foodBase;
-                foodCgst = foodTotalTax / 2;
-                foodSgst = foodTotalTax / 2;
-            } else {
-                foodBase = 120000; // default additive base for food if exclusive
-                foodCgst = foodBase * (foodHalf / 100);
-                foodSgst = foodBase * (foodHalf / 100);
-                foodTotal = foodBase + foodCgst + foodSgst;
-                grandTotal = hallTotal + foodTotal;
-            }
-
-            grandTax = hallCgst + hallSgst + foodCgst + foodSgst;
+            const grandTax = hallCgst + hallSgst + foodCgst + foodSgst;
 
             // Render Results
             document.getElementById('resHallBase').innerText = formatCurrency(hallBase);
